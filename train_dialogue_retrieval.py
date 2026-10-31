@@ -1,11 +1,3 @@
-"""
-Training Script for Doctor-Patient Q&A Retrieval Engine
-======================================================
-Dataset: d:\\dialogues.csv (256,916 conversations)
-Method: TF-IDF Vector Space Model + Cosine Similarity Search Index
-Output: models/dialogue_search_index.joblib
-"""
-
 import os
 import time
 import joblib
