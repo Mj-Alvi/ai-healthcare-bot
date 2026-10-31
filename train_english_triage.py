@@ -1,13 +1,3 @@
-"""
-Training Script for English Triage & Intent Classifier
-======================================================
-Dataset: d:\\healthcare_patient_queries_combined_300k.csv (150,000 English queries)
-Model: TF-IDF + SGDClassifier (Logistic Loss)
-Outputs:
-  - models/english_triage_pipeline.joblib
-  - models/english_intent_pipeline.joblib
-"""
-
 import os
 import time
 import joblib
