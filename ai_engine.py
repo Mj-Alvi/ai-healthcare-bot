@@ -231,30 +231,6 @@ def predict_disease_from_symptoms(text: str) -> dict:
     }
 
 
-def search_dialogue_archive(query: str, threshold: float = 0.32) -> dict:
-    """Search doctor-patient conversation archive using TF-IDF cosine similarity."""
-    idx_data = _load_model("dialogue_search_index")
-    if not idx_data:
-        return None
-
-    vectorizer = idx_data['vectorizer']
-    tfidf_matrix = idx_data['tfidf_matrix']
-
-    q_vec = vectorizer.transform([query])
-    scores = cosine_similarity(q_vec, tfidf_matrix).flatten()
-    best_idx = int(np.argmax(scores))
-    best_score = float(scores[best_idx])
-
-    if best_score < threshold:
-        return None
-
-    return {
-        "score": best_score,
-        "matched_query": idx_data['patients'][best_idx],
-        "doctor_answer": idx_data['doctors'][best_idx]
-    }
-
-
 def generate_bot_response(query: str, language: str = "English", gemini_api_key: str = None) -> dict:
     """
     Master pipeline:
@@ -325,23 +301,7 @@ def generate_bot_response(query: str, language: str = "English", gemini_api_key:
                 "language": effective_language
             }
 
-    # 4. Doctor-Patient Q&A Similarity Retrieval (for English)
-    if not is_banglish(query) and not is_bangla(query):
-        dialogue_result = search_dialogue_archive(query)
-        if dialogue_result is not None:
-            answer = f"### Doctor Consultation Archive (Similar Clinical Case)\n\n"
-            answer += f"{dialogue_result['doctor_answer']}\n\n"
-            answer += f"> *Retrieved from verified physician consultations (relevance match: {dialogue_result['score']*100:.1f}%).* "
-            answer += f"Individual health cases vary; do not alter your medication without direct medical supervision."
-            return {
-                "type": "dialogue_retrieval",
-                "answer": answer,
-                "sources": [{"title": "Verified Medical Dialogue Archive", "url": "https://www.nhs.uk"}],
-                "triage": triage,
-                "language": effective_language
-            }
-
-    # 5. Generative Fallback for Questions (Full English, Bangla & Banglish understanding)
+    # 4. Generative Fallback for Questions (Full English, Bangla & Banglish understanding)
     gemini_res = ask_gemini_medical(query, effective_language, gemini_api_key)
     if gemini_res["success"]:
         return {
@@ -352,7 +312,7 @@ def generate_bot_response(query: str, language: str = "English", gemini_api_key:
             "language": effective_language
         }
 
-    # 6. Unsupported / Safe Refusal
+    # 5. Unsupported / Safe Refusal
     return {
         "type": "unsupported",
         "answer": None,

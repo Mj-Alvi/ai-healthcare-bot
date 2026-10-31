@@ -69,9 +69,6 @@ class AIEngineTests(unittest.TestCase):
         self.assertEqual(res["type"], "curated_kb")
         self.assertIn("Dengue", res["answer"])
 
-    def test_ai_engine_dialogue_retrieval(self):
-        res = generate_bot_response("How to reduce weight with hypothyroidism?", "English")
-        self.assertEqual(res["type"], "dialogue_retrieval")
         self.assertIsNotNone(res["answer"])
 
     def test_ai_engine_identity_banglish(self):
