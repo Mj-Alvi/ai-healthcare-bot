@@ -1,10 +1,3 @@
-"""
-Training Script for Symptom-to-Disease Predictor
-================================================
-Dataset: disease_symptoms.xlsx (4,920 cases, 41 diseases, 131 unique symptoms)
-Model: Multinomial Naive Bayes / Random Forest with symptom multi-hot encoding
-"""
-
 import os
 import joblib
 import pandas as pd
