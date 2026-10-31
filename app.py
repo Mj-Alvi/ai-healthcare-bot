@@ -1,9 +1,3 @@
-"""Beginner-friendly, bilingual healthcare information bot (educational MVP).
-
-This app does not diagnose, prescribe, or replace professional medical care.
-It uses only a small, curated local knowledge base and conservative keyword rules.
-"""
-
 import streamlit as st
 
 from ai_engine import generate_bot_response
