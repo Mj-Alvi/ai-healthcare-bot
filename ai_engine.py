@@ -72,6 +72,75 @@ def is_banglish(text: str) -> bool:
     ])
 
 
+IDENTITY_PATTERNS = [
+    # English identity & creation
+    r"\bwho\s+(are|r)\s+(you|u)\b",
+    r"\bwho\s+(made|created|built|developed|programmed)\s+(you|u)\b",
+    r"\bwho\s+is\s+your\s+(creator|developer|author|maker|owner|programmer)\b",
+    r"\bwhat\s+(model|version)\b",
+    r"\bwhich\s+(model|version)\b",
+    r"\bwhat\s+is\s+your\s+name\b",
+    r"\btell\s+me\s+about\s+yourself\b",
+    r"\bintroduce\s+yourself\b",
+    r"\bwho\s+developed\b",
+    r"\bwho\s+built\s+you\b",
+    r"\byour\s+developer\b",
+    r"\byour\s+creator\b",
+
+    # Banglish identity & creation
+    r"\btumi\s+k[e]?\b",
+    r"\bapni\s+k[e]?\b",
+    r"\btui\s+k[e]?\b",
+    r"\btor\s+nam\s+ki\b",
+    r"\btomar\s+nam\s+ki\b",
+    r"\bapnar\s+nam\s+ki\b",
+    r"\b(tomar|apnar|tor)\s+(creator|developer|malik)\b",
+    r"\b(tomar|apnar|tor)\s+porichoy\b",
+    r"\bkar\s+dara\s+developed\b",
+    r"\bkader\s+dara\s+developed\b",
+    r"\bkara\s+develop\s+koreche\b",
+    r"\bke\s+(develop|created?)\s+(koreche|korse|korche)\b",
+    r"\bke\s+(toiri|toiry)\s+(koreche|korse|korche)\b",
+    r"\bke\s+bani[ye]?che\b",
+    r"\bke\s+banise\b",
+    r"\btomake\s+ke\s+(baniyeche|banise|toiri|develop)\b",
+    r"\bapnake\s+ke\s+(baniyeche|banise|toiri|develop)\b",
+    r"\bkon\s+model\b",
+    r"\bkon\s+version\b",
+    r"\bkiser\s+model\b",
+
+    # Bengali script identity & creation
+    r"তুমি\s*কে",
+    r"আপনি\s*কে",
+    r"তুই\s*কে",
+    r"কে\s*তোমাকে\s*বানিয়েছে",
+    r"কে\s*তোমাকে\s*বানাইছে",
+    r"কে\s*আপনাকে\s*বানিয়েছে",
+    r"কে\s*আপনাকে\s*তৈরি\s*করেছে",
+    r"কে\s*তৈরি\s*করেছে",
+    r"কে\s*ডেভেলপ\s*করেছে",
+    r"কার\s*দ্বারা\s*তৈরি",
+    r"কার\s*দ্বারা\s*ডেভেলপ",
+    r"কাদের\s*দ্বারা\s*ডেভেলপ",
+    r"কোন\s*মডেল",
+    r"কোন\s*ভার্সন",
+    r"আপনার\s*নাম\s*কী",
+    r"আপনার\s*নাম\s*কি",
+    r"তোমার\s*নাম\s*কী",
+    r"তোমার\s*নাম\s*কি",
+    r"তোমার\s*পরিচয়",
+    r"আপনার\s*পরিচয়",
+    r"তোমার\s*ডেভেলপার\s*কে",
+    r"আপনার\s*ডেভেলপার\s*কে",
+]
+
+
+def is_identity_query(text: str) -> bool:
+    """Check if query is asking about bot identity, creator, model, or version."""
+    clean = re.sub(r'[^\w\s\u0980-\u09FF]', ' ', text.lower()).strip()
+    return any(bool(re.search(p, clean, re.IGNORECASE)) for p in IDENTITY_PATTERNS)
+
+
 def detect_user_language(text: str, user_preference: str = "Auto") -> str:
     """
     Intelligently determines the response language:
@@ -208,7 +277,21 @@ def generate_bot_response(query: str, language: str = "English", gemini_api_key:
             "language": effective_language
         }
 
-    # 2. Curated reviewed knowledge base
+    # 2. Bot Identity & Developer Check (Attributes solely to Alvi, never reveals model/version)
+    if is_identity_query(query):
+        if effective_language == "বাংলা":
+            ans = "আমি একটি এআই হেলথ অ্যাসিস্ট্যান্ট (AI Health Assistant)। আমাকে আলভী (Alvi) ডেভেলপ করেছেন।"
+        else:
+            ans = "I am an AI Health Assistant, developed by Alvi."
+        return {
+            "type": "identity",
+            "answer": ans,
+            "sources": [],
+            "triage": {"level": "routine", "category": "identity", "source": "system_identity"},
+            "language": effective_language
+        }
+
+    # 3. Curated reviewed knowledge base
     kb_result = search_knowledge(query, effective_language)
     if kb_result is not None:
         return {

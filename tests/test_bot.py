@@ -74,6 +74,28 @@ class AIEngineTests(unittest.TestCase):
         self.assertEqual(res["type"], "dialogue_retrieval")
         self.assertIsNotNone(res["answer"])
 
+    def test_ai_engine_identity_banglish(self):
+        res = generate_bot_response("tumi ke")
+        self.assertEqual(res["type"], "identity")
+        self.assertIn("Alvi", res["answer"])
+        self.assertNotIn("Gemini", res["answer"])
+
+    def test_ai_engine_identity_english(self):
+        res = generate_bot_response("Who are you?", "English")
+        self.assertEqual(res["type"], "identity")
+        self.assertIn("Alvi", res["answer"])
+        self.assertNotIn("Gemini", res["answer"])
+
+    def test_ai_engine_identity_bangla_model(self):
+        res = generate_bot_response("kon model eta")
+        self.assertEqual(res["type"], "identity")
+        self.assertIn("Alvi", res["answer"])
+
+    def test_ai_engine_identity_developer(self):
+        res = generate_bot_response("kar dara developed")
+        self.assertEqual(res["type"], "identity")
+        self.assertIn("Alvi", res["answer"])
+
     def test_ai_engine_unsupported_abstain(self):
         res = generate_bot_response("Can you teach me how to bake chocolate cookies?", "English")
         self.assertEqual(res["type"], "unsupported")
