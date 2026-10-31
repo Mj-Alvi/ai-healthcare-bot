@@ -1,20 +1,3 @@
-"""
-Training Script for Bangla Medical Query Intent & Urgency Classifier
-====================================================================
-Course: CSE AI / NLP Healthcare Project
-Dataset: d:\\bangla_health_queries_500k.csv (500,000 Bangla health queries)
-
-This script trains two NLP pipelines:
-1. Urgency Classifier: Routine vs Urgent Review vs Emergency
-2. Category Classifier: Symptom, Medicine, Disease, Emergency, etc.
-
-Method:
-- TF-IDF (Term Frequency-Inverse Document Frequency) n-gram vectorizer
-- Linear Support Vector Classification (LinearSVC) / Logistic Regression
-- Evaluation: Classification Report (Precision, Recall, F1-Score)
-- Export: Serialized joblib models saved into models/
-"""
-
 import os
 import sys
 import time
